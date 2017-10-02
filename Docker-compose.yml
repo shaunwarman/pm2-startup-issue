@@ -1,0 +1,21 @@
+version: '2.1'
+services:
+  config:
+    build: ./config
+    container_name: config
+    healthcheck:
+      test: 'test -d /appdata/ready && exit 0 || exit 1'
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    volumes:
+      - /dependencies/deploy
+      - /appdata
+  node:
+    build: ./pm2
+    container_name: node
+    depends_on:
+      config:
+        condition: service_healthy
+    volumes_from:
+      - config
